@@ -4,6 +4,12 @@
     "slug": "dragon-strike",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon_new.png",
+    "splash": {
+      "image": "./assets/splash_new.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
