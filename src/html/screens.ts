@@ -43,9 +43,15 @@ function drawMenuSprites(){
   var t=menuFrame*0.05, fr=menuFrame;
   ctx.save();ctx.translate(50,40);drawBomb(ctx,t);ctx.restore();
   ctx.save();ctx.translate(125,40);ctx.translate(15,15);ctx.rotate(fr*3*Math.PI/180);ctx.translate(-15,-15);drawShuriken(ctx);ctx.restore();
-  ctx.save();ctx.translate(20,65);drawPyramid(ctx,fr,0);ctx.restore();
-  ctx.save();ctx.translate(83,65);drawCaduc(ctx,t);ctx.restore();
-  ctx.save();ctx.translate(168,75);drawScarab(ctx,t,0);ctx.restore();
+  
+  // Caduc spostato a sinistra (dove prima c'era la piramide)
+  ctx.save();ctx.translate(20,65);drawCaduc(ctx,t);ctx.restore();
+  
+  // Piramide spostata al centro con il draghetto più in alto
+  ctx.save();ctx.translate(83,65);drawPyramid(ctx,fr,0);ctx.restore();
+  ctx.save();ctx.translate(75,0);drawDragon(ctx,fr);ctx.restore();
+  
+  ctx.save();ctx.translate(162,75);drawScarab(ctx,t,0);ctx.restore();
 }
 function startMenuAnim(){
   menuFrame=0;
