@@ -1,4 +1,4 @@
-# Guida alla Compilazione (Build) per Killuminati
+# Guida alla Compilazione (Build) per Dragon Strike
 
 Questo progetto è basato su **Expo**. Il metodo più semplice e supportato per generare le build (eseguibili) per iOS e Android è utilizzare **EAS (Expo Application Services)** Build.
 
@@ -20,6 +20,32 @@ Se è la primissima volta che usi EAS in questo progetto, esegui il comando di c
 ```bash
 eas build:configure
 ```
+
+## ⚙️ Configurazione Pre-Compilazione (IMPORTANTE)
+
+Prima di avviare qualsiasi comando di compilazione (build), assicurati di aver eseguito questi passaggi fondamentali introdotti con i recenti aggiornamenti:
+
+1. **Installazione Dipendenze (Risoluzione Conflitti):**
+   A causa dell'aggiornamento a React 19, alcuni pacchetti (come `react-native-webview`) richiedono l'installazione con il flag legacy:
+   ```bash
+   npm install --legacy-peer-deps
+   ```
+
+2. **Configurazione AdMob (App ID):**
+   Se hai intenzione di riattivare o utilizzare gli annunci Google AdMob in produzione, **DEVI** inserire i tuoi veri *App ID* all'interno del file `app.json` prima della compilazione. 
+   Apri `app.json` e sostituisci le "X" con i tuoi codici forniti dalla console AdMob:
+   ```json
+   "plugins": [
+     [
+       "react-native-google-mobile-ads",
+       {
+         "androidAppId": "ca-app-pub-TUO_CODICE_ANDROID",
+         "iosAppId": "ca-app-pub-TUO_CODICE_IOS"
+       }
+     ]
+   ]
+   ```
+   *(Nota: Se compili l'app con gli ID fittizi o non validi, l'app potrebbe crashare istantaneamente all'avvio sul dispositivo fisico).*
 
 ---
 

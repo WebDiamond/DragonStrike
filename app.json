@@ -1,23 +1,21 @@
 {
   "expo": {
-    "name": "Killuminati",
-    "slug": "killuminati",
+    "name": "Dragon Strike",
+    "slug": "dragon-strike",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.killuminati.game"
+      "bundleIdentifier": "com.dragonstrike.game"
     },
     "android": {
-      "package": "com.killuminati.game",
+      "package": "com.dragonstrike.game",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
@@ -25,7 +23,14 @@
     },
     "plugins": [
       "expo-asset",
-      "expo-font"
+      "expo-font",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX",
+          "iosAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX"
+        }
+      ]
     ],
     "extra": {
       "eas": {
