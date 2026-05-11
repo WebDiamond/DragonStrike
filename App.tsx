@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { StyleSheet, View, BackHandler } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -7,16 +7,14 @@ import { GAME_HTML } from "./src/gameHTML";
 
 // ── AdMob (commentato temporaneamente) ──────────────────────────
 // import {
-//   BannerAd,
-//   BannerAdSize,
 //   InterstitialAd,
 //   AdEventType,
 //   TestIds,
 // } from "react-native-google-mobile-ads";
-//
-// const BANNER_ID       = __DEV__ ? TestIds.BANNER       : "ca-app-pub-XXXXXXXX/XXXXXXXX";
+// 
+// // ID per l'annuncio Interstitial (Video/Full-screen)
 // const INTERSTITIAL_ID = __DEV__ ? TestIds.INTERSTITIAL : "ca-app-pub-XXXXXXXX/XXXXXXXX";
-//
+// 
 // const interstitial = InterstitialAd.createForAdRequest(INTERSTITIAL_ID, {
 //   requestNonPersonalizedAdsOnly: true,
 // });
@@ -25,9 +23,16 @@ import { GAME_HTML } from "./src/gameHTML";
 export default function App() {
   const webRef = useRef<WebView>(null);
 
+  // const hasShownStartupAd = useRef(false);
+
   // ── AdMob useEffect (commentato) ──────────────────────────────
   // useEffect(() => {
-  //   const unsubLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {});
+  //   const unsubLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
+  //     if (!hasShownStartupAd.current) {
+  //       hasShownStartupAd.current = true;
+  //       interstitial.show();
+  //     }
+  //   });
   //   const unsubClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
   //     interstitial.load();
   //   });
@@ -44,7 +49,9 @@ export default function App() {
       }
       // ── AdMob: interstitial al game over (commentato) ─────────
       // else if (msg.type === "gameOver") {
-      //   if (interstitial.loaded) interstitial.show();
+      //   if (interstitial.loaded && Math.random() <= 0.30) {
+      //     interstitial.show();
+      //   }
       // }
       // ──────────────────────────────────────────────────────────
     } catch (_) { }

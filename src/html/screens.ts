@@ -22,17 +22,71 @@ function showOver(s){
   showScreen('over');
 }
 
-/* ---- Menu background canvas ---- */
+/* ---- Menu background canvas (WebGL Shaders) ---- */
+var bgGl=null, bgProgram=null, bgTimeLoc=null, bgResLoc=null;
 function drawMenuBg(){
   var c=document.getElementById('menu-bg-c');
   if(!c)return;
   c.width=window.innerWidth; c.height=window.innerHeight;
-  var ctx=c.getContext('2d');
-  ctx.fillStyle='#0a0e08'; ctx.fillRect(0,0,c.width,c.height);
-  ctx.strokeStyle='#141a10'; ctx.lineWidth=0.5;
-  for(var x=0;x<c.width;x+=40){for(var y=0;y<c.height;y+=35){
-    ctx.beginPath();ctx.moveTo(x+20,y);ctx.lineTo(x,y+35);ctx.lineTo(x+40,y+35);ctx.closePath();ctx.stroke();
-  }}
+  var gl=c.getContext('webgl') || c.getContext('experimental-webgl');
+  if(!gl){
+    var ctx=c.getContext('2d');
+    ctx.fillStyle='#0a0e08'; ctx.fillRect(0,0,c.width,c.height);
+    return;
+  }
+  bgGl=gl;
+  var vsSource="attribute vec2 position; void main() { gl_Position = vec4(position, 0.0, 1.0); }";
+  var fsSource="precision mediump float; uniform float time; uniform vec2 resolution;" +
+    "float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }" +
+    "float noise(vec2 p) {" +
+    "  vec2 i = floor(p); vec2 f = fract(p); f = f * f * (3.0 - 2.0 * f);" +
+    "  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);" +
+    "}" +
+    "float fbm(vec2 p) {" +
+    "  float v = 0.0; float a = 0.5;" +
+    "  for (int i = 0; i < 5; i++) { v += a * noise(p); p *= 2.0; a *= 0.5; }" +
+    "  return v;" +
+    "}" +
+    "void main() {" +
+    "  vec2 uv = gl_FragCoord.xy / resolution.xy; uv.y *= resolution.y / resolution.x;" +
+    "  vec2 p = uv * 3.0; p.x += time * 0.2; p.y -= time * 0.5;" +
+    "  float n = fbm(p + fbm(p + time * 0.3));" +
+    "  vec3 color = vec3(n * 0.6, n * n * 0.15, n * n * n * 0.05);" +
+    "  gl_FragColor = vec4(color, 1.0);" +
+    "}";
+  function createShader(type, source) {
+    var shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    return shader;
+  }
+  var vs = createShader(gl.VERTEX_SHADER, vsSource);
+  var fs = createShader(gl.FRAGMENT_SHADER, fsSource);
+  bgProgram = gl.createProgram();
+  gl.attachShader(bgProgram, vs);
+  gl.attachShader(bgProgram, fs);
+  gl.linkProgram(bgProgram);
+  gl.useProgram(bgProgram);
+  var buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+  var posLoc = gl.getAttribLocation(bgProgram, "position");
+  gl.enableVertexAttribArray(posLoc);
+  gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+  bgTimeLoc = gl.getUniformLocation(bgProgram, "time");
+  bgResLoc = gl.getUniformLocation(bgProgram, "resolution");
+}
+function drawMenuBgFrame(time) {
+  if(!bgGl || !bgProgram) return;
+  var gl = bgGl;
+  var c = gl.canvas;
+  if(c.width !== window.innerWidth || c.height !== window.innerHeight) {
+    c.width = window.innerWidth; c.height = window.innerHeight;
+    gl.viewport(0, 0, c.width, c.height);
+  }
+  gl.uniform1f(bgTimeLoc, time * 0.001);
+  gl.uniform2f(bgResLoc, c.width, c.height);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
 
 /* ---- Menu sprites animation ---- */
@@ -58,6 +112,7 @@ function startMenuAnim(){
   var lastT=0, acc=0, STEP=100;
   (function loop(ts){
     menuAnimId=requestAnimationFrame(loop);
+    if(typeof drawMenuBgFrame==='function') drawMenuBgFrame(ts);
     if(lastT===0){lastT=ts;}
     acc+=ts-lastT; lastT=ts;
     if(acc>=STEP){menuFrame++;drawMenuSprites();acc-=STEP;}
